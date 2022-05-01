@@ -1,0 +1,13 @@
+[package]
+name = "limbo_pass"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+smooth-bevy-cameras = "0.4.0"
+bevy_rapier3d = "0.13.0"
+bevy_kira_audio = "0.9.0"
+
+[dependencies.bevy]
+version = "0.7.0"
+features = ["default", "render", "bevy_winit", "bevy_gltf", "dynamic"]

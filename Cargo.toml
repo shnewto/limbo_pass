@@ -1,0 +1,6 @@
+[workspace]
+
+members = [
+    "limbo_pass",
+]
+resolver = "2"
