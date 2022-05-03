@@ -16,7 +16,7 @@ cargo run --release
 
 - space bar
 - ← ↑ ↓ →
-- a s d f
+- w a s d
 
 ## look
 
