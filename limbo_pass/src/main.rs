@@ -1,4 +1,4 @@
-use bevy::{asset::AssetServerSettings, prelude::*, window::PresentMode};
+use bevy::{prelude::*, window::PresentMode};
 use bevy_kira_audio::AudioPlugin;
 use bevy_rapier3d::prelude::*;
 use smooth_bevy_cameras::{controllers::orbit::OrbitCameraPlugin, LookTransformPlugin};
@@ -11,10 +11,6 @@ mod theme;
 fn main() {
     App::new()
         .insert_resource(Msaa::default())
-        .insert_resource(AssetServerSettings {
-            watch_for_changes: true,
-            ..default()
-        })
         .insert_resource(WindowDescriptor {
             title: "limbo pass".to_string(),
             present_mode: PresentMode::Fifo,
