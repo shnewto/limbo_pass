@@ -6,7 +6,7 @@
     "extensionsUsed" : [
         "KHR_materials_transmission"
     ],
-    "scene" : 1,
+    "scene" : 0,
     "scenes" : [
         {
             "name" : "FORM",
@@ -39,7 +39,6 @@
     "materials" : [
         {
             "alphaMode" : "BLEND",
-            "doubleSided" : true,
             "emissiveFactor" : [
                 0.01919732615351677,
                 0.9386863112449646,
