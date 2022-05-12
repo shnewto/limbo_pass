@@ -6,7 +6,7 @@
     "extensionsUsed" : [
         "KHR_materials_transmission"
     ],
-    "scene" : 0,
+    "scene" : 1,
     "scenes" : [
         {
             "name" : "FORM",
@@ -85,7 +85,6 @@
             }
         },
         {
-            "doubleSided" : true,
             "name" : "surface",
             "pbrMetallicRoughness" : {
                 "baseColorFactor" : [

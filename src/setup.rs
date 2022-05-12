@@ -3,11 +3,6 @@ use bevy_rapier3d::prelude::*;
 use smooth_bevy_cameras::controllers::orbit::{OrbitCameraBundle, OrbitCameraController};
 
 pub fn lighting(mut commands: Commands, mut ambient_light: ResMut<AmbientLight>) {
-    let clear_color_hex_string = "0a0e17";
-    commands.insert_resource(ClearColor(
-        Color::hex(clear_color_hex_string)
-            .unwrap_or_else(|_| panic!("couldn't make hex color from {}", clear_color_hex_string)),
-    ));
     ambient_light.brightness = 0.6;
     ambient_light.color = Color::SILVER;
     let point_light_intensity = 20000.0;

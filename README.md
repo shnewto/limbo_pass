@@ -4,13 +4,16 @@ a little game, limbo on a mountain pass
 
 ![limbo pass screenshot](img/bevy-scene.png)
 
-## run the game
+## run the game with trunk (wasm)
 
-build / run with the **release** flag so the overworld theme loads on time :)
+make sure you have trunk https://trunkrs.dev/
 
-```sh
-cargo run --release
+then
 ```
+trunk serve --release
+```
+
+and open http://127.0.0.1:8080 in your browser
 
 ## wander
 

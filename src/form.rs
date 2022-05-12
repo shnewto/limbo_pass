@@ -1,9 +1,23 @@
+use crate::fsm::Fsm;
 use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
 
 // Movement and Form implementation draws _heavily_ from the player/ship/controller in the
 // blender_bevy_top_down_space_shooter, very cool project!
 // https://github.com/sdfgeoff/blender_bevy_top_down_space_shooter
+
+pub struct FormPlugin;
+
+impl Plugin for FormPlugin {
+    fn build(&self, app: &mut App) {
+        app.add_system_set(
+            SystemSet::on_update(Fsm::Running)
+                .with_system(get_movement.label("get_movement"))
+                .with_system(apply_movement.after("get_movement").label("apply_movement"))
+                .with_system(wrap_movement.after("apply_movement")),
+        );
+    }
+}
 
 #[derive(Default, Component, Debug)]
 pub struct Form {

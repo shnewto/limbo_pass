@@ -1,10 +1,15 @@
-use bevy::prelude::*;
 
-#[derive(Debug, Clone, Eq, PartialEq, Hash)]
-pub enum Fsm {
-    Loading,
-    MainMenu,
-    Running,
+use crate::asset::FontAssets;
+use bevy::prelude::*;
+use crate::fsm::Fsm;
+
+pub struct MenuPlugin;
+
+impl Plugin for MenuPlugin {
+    fn build(&self, app: &mut App) {
+        app.add_system_set(SystemSet::on_enter(Fsm::MainMenu).with_system(main_menu_init))
+            .add_system_set(SystemSet::on_update(Fsm::MainMenu).with_system(menu_interactions));
+    }
 }
 
 type ButtonInteraction<'a> = (Entity, &'a Interaction, &'a mut UiColor);
@@ -30,7 +35,7 @@ pub fn menu_interactions(
     }
 }
 
-pub fn main_menu_init(mut commands: Commands, asset_server: Res<AssetServer>) {
+pub fn main_menu_init(mut commands: Commands, font_assets: Res<FontAssets>) {
     commands.spawn_bundle(UiCameraBundle::default());
     commands
         .spawn_bundle(ButtonBundle {
@@ -50,7 +55,7 @@ pub fn main_menu_init(mut commands: Commands, asset_server: Res<AssetServer>) {
                     sections: vec![TextSection {
                         value: "play".to_string(),
                         style: TextStyle {
-                            font: asset_server.load("font/square.ttf"),
+                            font: font_assets.menu_font_handle.clone(),
                             font_size: 40.0,
                             color: Color::rgb(0.9, 0.9, 0.9),
                         },

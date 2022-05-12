@@ -6,18 +6,31 @@ use bevy::{
 };
 use bevy_rapier3d::prelude::*;
 
+use crate::asset::SceneAssets;
 use crate::form::{Form, Movements};
+use crate::fsm::Fsm;
+use crate::setup;
+pub struct ScenePlugin;
 
-pub struct SceneHandle {
-    pub handle: Handle<Scene>,
+impl Plugin for ScenePlugin {
+    fn build(&self, app: &mut App) {
+        app.add_system_set(SystemSet::on_enter(Fsm::Loading).with_system(load))
+            .add_system_set(
+                SystemSet::on_enter(Fsm::Running)
+                    .with_system(spawn)
+                    .with_system(setup::camera)
+                    .with_system(setup::lighting)
+                    .with_system(setup::physics),
+            );
+    }
+}
+
+pub struct SceneState {
     pub is_loaded: bool,
 }
 
-pub fn load(mut commands: Commands, asset_server: Res<AssetServer>) {
-    commands.insert_resource(SceneHandle {
-        handle: asset_server.load("gltf/limbo_pass.gltf"),
-        is_loaded: false,
-    });
+pub fn load(mut commands: Commands) {
+    commands.insert_resource(SceneState { is_loaded: false });
 }
 
 pub fn spawn(
@@ -25,14 +38,15 @@ pub fn spawn(
     assets_gltf: Res<Assets<Gltf>>,
     gltf_meshes: Res<Assets<GltfMesh>>,
     meshes: Res<Assets<Mesh>>,
-    mut scene_handle: ResMut<SceneHandle>,
+    scene_assets: ResMut<SceneAssets>,
+    mut scene_state: ResMut<SceneState>,
     mut commands: Commands,
 ) {
-    if !scene_handle.is_loaded
-        && asset_server.get_load_state(&scene_handle.handle) == LoadState::Loaded
+    if !scene_state.is_loaded
+        && asset_server.get_load_state(&scene_assets.limbo_pass_handle) == LoadState::Loaded
     {
         let point_light_color_hex_string = "70FF00";
-        if let Some(scenes_gltf) = assets_gltf.get(&scene_handle.handle) {
+        if let Some(scenes_gltf) = assets_gltf.get(&scene_assets.limbo_pass_handle) {
             let _foot_light = PointLightBundle {
                 point_light: PointLight {
                     color: Color::hex(point_light_color_hex_string).unwrap_or_else(|_| {
@@ -100,7 +114,7 @@ pub fn spawn(
                     });
             }
 
-            scene_handle.is_loaded = true;
+            scene_state.is_loaded = true;
         }
     }
 }
