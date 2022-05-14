@@ -10,7 +10,7 @@ make sure you have trunk https://trunkrs.dev/
 
 then
 ```
-trunk serve --release
+trunk serve
 ```
 
 and open http://127.0.0.1:8080 in your browser
