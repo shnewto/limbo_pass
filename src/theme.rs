@@ -1,6 +1,5 @@
 use crate::asset::AudioAssets;
 use bevy::{asset::LoadState, prelude::*};
-use bevy_kira_audio::Audio;
 
 use crate::fsm::Fsm;
 
@@ -16,7 +15,6 @@ impl Plugin for ThemePlugin {
 pub struct ThemeState {
     audio_loaded: bool,
 }
-
 
 pub fn load(mut commands: Commands) {
     let theme_state = ThemeState {
@@ -35,8 +33,7 @@ pub fn play(
     if !theme_state.audio_loaded
         && LoadState::Loaded == asset_server.get_load_state(&audio_assets.theme_handle)
     {
-        audio.set_volume(1.3);
-        audio.play_looped(audio_assets.theme_handle.clone());
+        audio.play(audio_assets.theme_handle.clone());
         theme_state.audio_loaded = true;
     }
 }

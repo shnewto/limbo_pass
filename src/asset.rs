@@ -1,13 +1,9 @@
 use crate::fsm::Fsm;
 use bevy::prelude::*;
 use bevy_asset_loader::{AssetCollection, AssetLoader};
-use bevy_kira_audio::AudioSource;
 
 pub struct LoadingPlugin;
 
-/// This plugin loads all assets using [AssetLoader] from a third party bevy plugin
-/// Alternatively you can write the logic to load assets yourself
-/// If interested, take a look at https://bevy-cheatbook.github.io/features/assets.html
 impl Plugin for LoadingPlugin {
     fn build(&self, app: &mut App) {
         AssetLoader::new(Fsm::Loading)
@@ -18,7 +14,6 @@ impl Plugin for LoadingPlugin {
             .build(app);
     }
 }
-
 
 #[derive(AssetCollection)]
 pub struct FontAssets {

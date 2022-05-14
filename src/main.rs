@@ -1,5 +1,4 @@
 use bevy::{prelude::*, window::PresentMode};
-use bevy_kira_audio::AudioPlugin;
 use bevy_rapier3d::prelude::*;
 use smooth_bevy_cameras::{controllers::orbit::OrbitCameraPlugin, LookTransformPlugin};
 
@@ -22,14 +21,14 @@ fn main() {
             ..default()
         })
         .insert_resource(ClearColor(
-            Color::hex(clear_color_hex_string)
-                .unwrap_or_else(|_| panic!("couldn't make hex color from {}", clear_color_hex_string)),
+            Color::hex(clear_color_hex_string).unwrap_or_else(|_| {
+                panic!("couldn't make hex color from {}", clear_color_hex_string)
+            }),
         ))
         .insert_resource(form::Movements::default())
         .add_plugins(DefaultPlugins)
         .add_plugin(LookTransformPlugin)
         .add_plugin(OrbitCameraPlugin::default())
-        .add_plugin(AudioPlugin)
         .add_plugin(RapierPhysicsPlugin::<NoUserData>::default())
         .add_plugin(limbo::LimboPlugin)
         .run();
