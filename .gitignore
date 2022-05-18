@@ -14,3 +14,4 @@ Cargo.lock
 ignore.txt
 
 **/*track_1*
+.vercel

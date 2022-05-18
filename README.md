@@ -51,3 +51,11 @@ some details on implementation on the blender side. in case you're curious or lo
 ![terrain scene](img/terrain-scene.png)
 
 ![gltf export](img/gltf-export.png)
+
+## deploy
+
+```
+trunk build --release
+wasm-opt -Oz dist/limbo_pass-<hash>_bg.wasm -o dist/limbo_pass-<hash>_bg.wasm
+vercel --prod
+```
