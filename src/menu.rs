@@ -1,7 +1,6 @@
-
 use crate::asset::FontAssets;
-use bevy::prelude::*;
 use crate::fsm::Fsm;
+use bevy::prelude::*;
 
 pub struct MenuPlugin;
 

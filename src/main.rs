@@ -22,8 +22,9 @@ fn main() {
             ..default()
         })
         .insert_resource(ClearColor(
-            Color::hex(clear_color_hex_string)
-                .unwrap_or_else(|_| panic!("couldn't make hex color from {}", clear_color_hex_string)),
+            Color::hex(clear_color_hex_string).unwrap_or_else(|_| {
+                panic!("couldn't make hex color from {}", clear_color_hex_string)
+            }),
         ))
         .insert_resource(form::Movements::default())
         .add_plugins(DefaultPlugins)

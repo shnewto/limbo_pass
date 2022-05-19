@@ -71,9 +71,11 @@ pub fn mute_interactions(
             }
             Interaction::None => {
                 let clear_color_hex_string = "0a0e17";
-                *color =Color::hex(clear_color_hex_string).unwrap_or_else(|_| {
-                    panic!("couldn't make hex color from {}", clear_color_hex_string)
-                }).into();
+                *color = Color::hex(clear_color_hex_string)
+                    .unwrap_or_else(|_| {
+                        panic!("couldn't make hex color from {}", clear_color_hex_string)
+                    })
+                    .into();
             }
         }
     }
@@ -98,9 +100,11 @@ pub fn mute_button_init(mut commands: Commands, font_assets: Res<FontAssets>) {
                 },
                 ..Default::default()
             },
-            color: Color::hex(clear_color_hex_string).unwrap_or_else(|_| {
-                panic!("couldn't make hex color from {}", clear_color_hex_string)
-            }).into(),
+            color: Color::hex(clear_color_hex_string)
+                .unwrap_or_else(|_| {
+                    panic!("couldn't make hex color from {}", clear_color_hex_string)
+                })
+                .into(),
             ..Default::default()
         })
         .insert(MuteButton)

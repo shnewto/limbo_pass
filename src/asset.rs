@@ -16,7 +16,6 @@ impl Plugin for LoadingPlugin {
     }
 }
 
-
 #[derive(AssetCollection)]
 pub struct FontAssets {
     #[asset(path = "font/square.ttf")]

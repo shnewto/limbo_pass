@@ -21,7 +21,7 @@ impl Plugin for ScenePlugin {
                     .with_system(spawn)
                     .with_system(setup::camera)
                     .with_system(setup::lighting)
-                    .with_system(setup::physics)
+                    .with_system(setup::physics),
             );
     }
 }
