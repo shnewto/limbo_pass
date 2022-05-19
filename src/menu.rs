@@ -55,7 +55,7 @@ pub fn main_menu_init(mut commands: Commands, font_assets: Res<FontAssets>) {
                     sections: vec![TextSection {
                         value: "play".to_string(),
                         style: TextStyle {
-                            font: font_assets.menu_font_handle.clone(),
+                            font: font_assets.button_font_handle.clone(),
                             font_size: 40.0,
                             color: Color::rgb(0.9, 0.9, 0.9),
                         },

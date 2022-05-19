@@ -10,6 +10,7 @@ use crate::asset::SceneAssets;
 use crate::form::{Form, Movements};
 use crate::fsm::Fsm;
 use crate::setup;
+
 pub struct ScenePlugin;
 
 impl Plugin for ScenePlugin {
@@ -20,7 +21,7 @@ impl Plugin for ScenePlugin {
                     .with_system(spawn)
                     .with_system(setup::camera)
                     .with_system(setup::lighting)
-                    .with_system(setup::physics),
+                    .with_system(setup::physics)
             );
     }
 }
