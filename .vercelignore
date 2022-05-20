@@ -5,3 +5,8 @@ Cargo*
 src
 blend
 .cargo
+img
+/assets
+README.md
+/styles.css
+/index.html

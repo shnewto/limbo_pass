@@ -17,8 +17,11 @@ impl Plugin for ScenePlugin {
     fn build(&self, app: &mut App) {
         app.add_system_set(SystemSet::on_enter(Fsm::Loading).with_system(load))
             .add_system_set(
-                SystemSet::on_enter(Fsm::Running)
+                SystemSet::on_exit(Fsm::MainMenu)
                     .with_system(spawn)
+            )
+            .add_system_set(
+                SystemSet::on_enter(Fsm::Running)
                     .with_system(setup::camera)
                     .with_system(setup::lighting)
                     .with_system(setup::physics),
