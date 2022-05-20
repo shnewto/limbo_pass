@@ -57,11 +57,10 @@ impl Movement {
 }
 
 #[derive(Default, Component, Debug)]
-pub struct Movements(Vec<Movement>);
+pub struct Movements(pub Vec<Movement>);
 
 pub fn get_movement(mut query: Query<&mut Movements>, keys: Res<Input<KeyCode>>) {
-    for mut movements in query.iter_mut() {
-        movements.0.clear();
+    if let Ok(mut movements) = query.get_single_mut() {
         let push_factor = 30.0;
         let turn_factor = 20.0;
         if keys.pressed(KeyCode::W) || keys.pressed(KeyCode::Up) {
@@ -92,14 +91,14 @@ pub fn get_movement(mut query: Query<&mut Movements>, keys: Res<Input<KeyCode>>)
 
 pub fn apply_movement(
     mut form_query: Query<(
-        &Movements,
+        &mut Movements,
         &Form,
         &GlobalTransform,
         &mut ExternalForce,
         &Velocity,
     )>,
 ) {
-    if let Ok((movements, form, global_transform, mut rb_forces, rb_velocities)) =
+    if let Ok((mut movements, form, global_transform, mut rb_forces, rb_velocities)) =
         form_query.get_single_mut()
     {
         let mut forces = Vec3::new(0.0, 0.0, 0.0);
@@ -121,6 +120,8 @@ pub fn apply_movement(
 
         rb_forces.force = forces;
         rb_forces.torque = torques;
+
+        movements.0.clear();
     }
 }
 
@@ -130,9 +131,6 @@ pub fn wrap_movement(mut form_query: Query<(&Form, &mut Transform)>) {
         let min_terrain_coord = -50.0;
         let current_x = transform.translation.x;
         let current_z = transform.translation.z;
-
-        // starting coords
-        // -40.0, 20.0, 0.0
 
         if current_x > max_terrain_coord
             || current_z > max_terrain_coord

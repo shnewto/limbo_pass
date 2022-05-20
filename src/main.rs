@@ -3,12 +3,11 @@ use bevy_kira_audio::AudioPlugin;
 use bevy_rapier3d::prelude::*;
 use smooth_bevy_cameras::{controllers::orbit::OrbitCameraPlugin, LookTransformPlugin};
 
-mod asset;
+mod assets;
 mod form;
 mod fsm;
 mod limbo;
-mod menu;
-mod scenes;
+mod loading_screen;
 mod setup;
 mod theme;
 
@@ -17,6 +16,8 @@ fn main() {
     App::new()
         .insert_resource(Msaa::default())
         .insert_resource(WindowDescriptor {
+            width: 1280.,
+            height: 720.,
             title: "limbo pass".to_string(),
             present_mode: PresentMode::Fifo,
             ..default()
