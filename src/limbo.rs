@@ -14,8 +14,8 @@ impl Plugin for LimboPlugin {
         app.add_state(Fsm::LoadingScreen)
             .add_plugin(LoadingScreenPlugin)
             .add_plugin(AssetsPlugin)
-            .add_plugin(SetupPlugin)
             .add_plugin(ThemePlugin)
+            .add_plugin(SetupPlugin)
             .add_plugin(FormPlugin);
     }
 }

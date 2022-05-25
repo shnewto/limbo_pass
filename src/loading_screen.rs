@@ -1,4 +1,4 @@
-use crate::{assets::FontAssets, form::Movements, fsm::Fsm};
+use crate::{assets::FontAssets, fsm::Fsm};
 use bevy::{asset::LoadState, prelude::*};
 
 pub struct LoadingScreenPlugin;
@@ -7,15 +7,12 @@ impl Plugin for LoadingScreenPlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(FontAssets::default())
             .insert_resource(FontAssets::default())
-            .insert_resource(LoadingScreenTimer(Timer::from_seconds(10.0, false)))
             .add_system_set(SystemSet::on_enter(Fsm::LoadingScreen).with_system(load_font))
             .add_system_set(SystemSet::on_update(Fsm::LoadingScreen).with_system(check_font))
             .add_system_set(SystemSet::on_exit(Fsm::LoadingScreen).with_system(spawn))
             .add_system_set(SystemSet::on_enter(Fsm::Running).with_system(despawn_loading_screen));
     }
 }
-#[derive(Component)]
-pub struct LoadingScreenTimer(Timer);
 
 //
 // font is a special case because we need it for the loading screen
@@ -80,23 +77,12 @@ pub fn spawn(mut commands: Commands, font_assets: Res<FontAssets>) {
 pub fn despawn_loading_screen(
     mut commands: Commands,
     mut loading_screen_state: ResMut<LoadingScreenState>,
-    // query: Query<&Movements>,
-    loading_screen_camera_query: Query<Entity, With<LoadingScreenCamera>>,
     loading_screen_text_query: Query<Entity, With<LoadingScreenText>>,
 ) {
-    // if let LoadingScreenState::Spawned = *loading_screen_state {
-    //     let movements = query.single();
-
-    //     if !movements.0.is_empty() {
-    let camera = loading_screen_camera_query.single();
     let text = loading_screen_text_query.single();
-
-    commands.entity(camera).despawn_recursive();
     commands.entity(text).despawn_recursive();
 
     *loading_screen_state = LoadingScreenState::Despawned;
-    //     }
-    // }
 }
 
 #[derive(Component)]

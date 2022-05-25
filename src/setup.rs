@@ -1,4 +1,4 @@
-use crate::assets::SceneAssets;
+use crate::assets::{FontAssets, SceneAssets};
 use crate::fsm::Fsm;
 use bevy::prelude::*;
 use bevy::{
@@ -15,19 +15,33 @@ pub struct SetupPlugin;
 
 impl Plugin for SetupPlugin {
     fn build(&self, app: &mut App) {
-        app.add_system_set(
-            SystemSet::on_enter(Fsm::Setup)
-                .with_system(scene.label("scene"))
-                .with_system(lighting.after("scene").label("lighting"))
-                .with_system(physics.after("lighting").label("physics"))
-                .with_system(complete.after("physics").label("complete")),
-        )
-        .add_system_set(SystemSet::on_exit(Fsm::Setup).with_system(camera));
+        app.insert_resource(LoadingTimer(Timer::from_seconds(2.0, false)))
+            .add_system_set(
+                SystemSet::on_enter(Fsm::Setup)
+                    .with_system(scene.label("scene"))
+                    .with_system(lighting.after("scene").label("lighting"))
+                    .with_system(physics.after("lighting").label("physics")),
+            )
+            .add_system_set(SystemSet::on_update(Fsm::Setup).with_system(complete))
+            .add_system_set(
+                SystemSet::on_enter(Fsm::Running)
+                    .with_system(camera.label("camera"))
+                    .with_system(mute_button.after("camera").label("mute")),
+            );
     }
 }
 
-pub fn complete(mut state: ResMut<State<Fsm>>) {
-    state.set(Fsm::Running).unwrap();
+#[derive(Component)]
+pub struct LoadingTimer(pub Timer);
+
+pub fn complete(
+    mut state: ResMut<State<Fsm>>,
+    mut loading_state: ResMut<LoadingTimer>,
+    time: Res<Time>,
+) {
+    if loading_state.0.tick(time.delta()).finished() {
+        state.set(Fsm::Running).unwrap();
+    }
 }
 
 pub fn scene(
@@ -181,47 +195,48 @@ pub fn camera(mut commands: Commands) {
     ));
 }
 
-// #[derive(Component)]
-// pub struct MuteButton;
+#[derive(Component)]
+pub struct MuteButton;
 
-// pub fn mute_button(mut commands: Commands, font_assets: Res<FontAssets>) {
-//     let clear_color_hex_string = "0a0e17";
-//     commands
-//         .spawn_bundle(ButtonBundle {
-//             style: Style {
-//                 size: Size::new(Val::Px(120.0), Val::Px(50.0)),
-//                 margin: Rect::all(Val::Auto),
-//                 justify_content: JustifyContent::Center,
-//                 align_items: AlignItems::Center,
-//                 position: Rect {
-//                     left: Val::Px(450.0),
-//                     bottom: Val::Px(250.0),
-//                     ..default()
-//                 },
-//                 ..Default::default()
-//             },
-//             color: Color::hex(clear_color_hex_string)
-//                 .unwrap_or_else(|_| {
-//                     panic!("couldn't make hex color from {}", clear_color_hex_string)
-//                 })
-//                 .into(),
-//             ..Default::default()
-//         })
-//         .insert(MuteButton)
-//         .with_children(|parent| {
-//             parent.spawn_bundle(TextBundle {
-//                 text: Text {
-//                     sections: vec![TextSection {
-//                         value: "play theme".to_string(),
-//                         style: TextStyle {
-//                             font: font_assets.square_font_handle.clone(),
-//                             font_size: 20.0,
-//                             color: Color::rgb(0.9, 0.9, 0.9),
-//                         },
-//                     }],
-//                     alignment: Default::default(),
-//                 },
-//                 ..Default::default()
-//             });
-//         });
-// }
+pub fn mute_button(mut commands: Commands, font_assets: Res<FontAssets>) {
+    // commands.spawn_bundle(UiCameraBundle::default());
+    let clear_color_hex_string = "0a0e17";
+    commands
+        .spawn_bundle(ButtonBundle {
+            style: Style {
+                size: Size::new(Val::Px(120.0), Val::Px(30.0)),
+                margin: Rect::all(Val::Auto),
+                justify_content: JustifyContent::Center,
+                align_items: AlignItems::Center,
+                position: Rect {
+                    left: Val::Px(450.0),
+                    bottom: Val::Px(250.0),
+                    ..default()
+                },
+                ..Default::default()
+            },
+            color: Color::hex(clear_color_hex_string)
+                .unwrap_or_else(|_| {
+                    panic!("couldn't make hex color from {}", clear_color_hex_string)
+                })
+                .into(),
+            ..Default::default()
+        })
+        .insert(MuteButton)
+        .with_children(|parent| {
+            parent.spawn_bundle(TextBundle {
+                text: Text {
+                    sections: vec![TextSection {
+                        value: "mute theme".to_string(),
+                        style: TextStyle {
+                            font: font_assets.square_font_handle.clone(),
+                            font_size: 20.0,
+                            color: Color::rgb(0.9, 0.9, 0.9),
+                        },
+                    }],
+                    alignment: Default::default(),
+                },
+                ..Default::default()
+            });
+        });
+}
