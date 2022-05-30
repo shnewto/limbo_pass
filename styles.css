@@ -9,4 +9,6 @@ canvas {
     left: 50%;
     transform: translate(-50%, -50%);
     background-color: #0a0e17;
+    outline: none;
+    -webkit-tap-highlight-color: #0a0e17; /* mobile webkit */
 }
