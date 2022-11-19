@@ -11,13 +11,15 @@ mod theme;
 fn main() {
     App::new()
         .insert_resource(Msaa::default())
-        .insert_resource(WindowDescriptor {
-            title: "limbo pass".to_string(),
-            present_mode: PresentMode::Fifo,
-            ..default()
-        })
         .insert_resource(form::Movements::default())
-        .add_plugins(DefaultPlugins)
+        .add_plugins(DefaultPlugins.set(WindowPlugin {
+            window: WindowDescriptor {
+                title: "limbo pass".to_string(),
+                present_mode: PresentMode::Fifo,
+                ..default()
+            },
+            ..default()
+        }))
         .add_plugin(LookTransformPlugin)
         .add_plugin(OrbitCameraPlugin::default())
         .add_plugin(AudioPlugin)

@@ -8,6 +8,7 @@ use bevy_rapier3d::prelude::*;
 
 use crate::form::{Form, Movements};
 
+#[derive(Resource)]
 pub struct SceneHandle {
     pub handle: Handle<Scene>,
     pub is_loaded: bool,
@@ -22,7 +23,7 @@ pub fn load(mut commands: Commands, asset_server: Res<AssetServer>) {
 
 pub fn spawn(
     asset_server: Res<AssetServer>,
-    assets_gltf: Res<Assets<Gltf>>,
+    gltf_assets: ResMut<Assets<Gltf>>,
     gltf_meshes: Res<Assets<GltfMesh>>,
     meshes: Res<Assets<Mesh>>,
     mut scene_handle: ResMut<SceneHandle>,
@@ -32,7 +33,8 @@ pub fn spawn(
         && asset_server.get_load_state(&scene_handle.handle) == LoadState::Loaded
     {
         let point_light_color_hex_string = "70FF00";
-        if let Some(scenes_gltf) = assets_gltf.get(&scene_handle.handle) {
+        let gltf = gltf_assets.get(&scene_handle.handle).unwrap();
+        if let Some(scenes_gltf) = gltf_assets.get(&scene_handle.handle) {
             let _foot_light = PointLightBundle {
                 point_light: PointLight {
                     color: Color::hex(point_light_color_hex_string).unwrap_or_else(|_| {
@@ -50,7 +52,7 @@ pub fn spawn(
             };
 
             commands
-                .spawn_bundle(TransformBundle::from(Transform::from_xyz(-45.0, 1.5, 0.0)))
+                .spawn(TransformBundle::from(Transform::from_xyz(-45.0, 1.5, 0.0)))
                 .insert(RigidBody::Dynamic)
                 .insert(LockedAxes::ROTATION_LOCKED_X | LockedAxes::ROTATION_LOCKED_Z)
                 .insert(Collider::ball(2.3))
@@ -63,7 +65,7 @@ pub fn spawn(
                     drag: Vec3::new(250.0, 500.0, 250.0),
                 })
                 .with_children(|parent| {
-                    parent.spawn_scene(scenes_gltf.named_scenes["FORM"].clone());
+                    parent.spawn(scenes_gltf.named_scenes["FORM"].clone());
                 });
 
             let terrain_mesh_handle = &scenes_gltf.named_meshes["TERRAIN"];
@@ -92,11 +94,10 @@ pub fn spawn(
                     .collect();
 
                 commands
-                    .spawn()
-                    .insert(Collider::trimesh(vertices, indices))
+                    .spawn(Collider::trimesh(vertices, indices))
                     .insert(ActiveEvents::COLLISION_EVENTS)
                     .with_children(|parent| {
-                        parent.spawn_scene(scenes_gltf.named_scenes["TERRAIN"].clone());
+                        parent.spawn(scenes_gltf.named_scenes["TERRAIN"].clone());
                     });
             }
 

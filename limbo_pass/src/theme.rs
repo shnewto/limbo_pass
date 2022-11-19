@@ -1,6 +1,7 @@
 use bevy::{asset::LoadState, prelude::*};
-use bevy_kira_audio::{Audio, AudioSource};
+use bevy_kira_audio::{Audio, AudioControl, AudioSource};
 
+#[derive(Resource)]
 pub struct ThemeState {
     audio_loaded: bool,
     loop_handle: Handle<AudioSource>,
@@ -24,7 +25,7 @@ pub fn play(
     if !audio_state.audio_loaded
         && LoadState::Loaded == asset_server.get_load_state(&audio_state.loop_handle)
     {
-        audio.play_looped(audio_state.loop_handle.clone());
+        audio.play(audio_state.loop_handle.clone()).looped();
         audio_state.audio_loaded = true;
     }
 }

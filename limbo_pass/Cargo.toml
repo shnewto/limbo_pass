@@ -4,10 +4,10 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-smooth-bevy-cameras = "0.4.0"
-bevy_rapier3d = "0.13.0"
-bevy_kira_audio = "0.9.0"
+smooth-bevy-cameras = { version = "0.6.0", git = "https://github.com/bonsairobo/smooth-bevy-cameras/", rev = "1388352469519b1451cd85482c46c8a4252440e7" }
+bevy_rapier3d = "0.19.0"
+bevy_kira_audio = "0.13.0"
 
 [dependencies.bevy]
-version = "0.7.0"
-features = ["default", "render", "bevy_winit", "bevy_gltf"]
+version = "0.9.0"
+features = ["default", "render", "bevy_winit", "bevy_gltf", "bevy_scene"]

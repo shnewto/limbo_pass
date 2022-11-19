@@ -18,7 +18,7 @@ pub fn lighting(mut commands: Commands, mut ambient_light: ResMut<AmbientLight>)
             point_light_color_hex_string
         )
     });
-    commands.spawn_bundle(PointLightBundle {
+    commands.spawn(PointLightBundle {
         point_light: PointLight {
             color,
             range: 50.,
@@ -29,7 +29,7 @@ pub fn lighting(mut commands: Commands, mut ambient_light: ResMut<AmbientLight>)
         ..Default::default()
     });
 
-    commands.spawn_bundle(PointLightBundle {
+    commands.spawn(PointLightBundle {
         point_light: PointLight {
             color,
             range: 50.,
@@ -40,7 +40,7 @@ pub fn lighting(mut commands: Commands, mut ambient_light: ResMut<AmbientLight>)
         ..Default::default()
     });
 
-    commands.spawn_bundle(PointLightBundle {
+    commands.spawn(PointLightBundle {
         point_light: PointLight {
             color,
             range: 50.,
@@ -51,7 +51,7 @@ pub fn lighting(mut commands: Commands, mut ambient_light: ResMut<AmbientLight>)
         ..Default::default()
     });
 
-    commands.spawn_bundle(PointLightBundle {
+    commands.spawn(PointLightBundle {
         point_light: PointLight {
             color,
             range: 50.,
@@ -69,9 +69,8 @@ pub fn physics(mut physics_config: ResMut<RapierConfiguration>) {
 }
 
 pub fn camera(mut commands: Commands) {
-    commands.spawn_bundle(OrbitCameraBundle::new(
+    commands.spawn(OrbitCameraBundle::new(
         OrbitCameraController::default(),
-        PerspectiveCameraBundle::default(),
         Vec3::new(-100.0, 60.0, 20.0),
         Vec3::new(0.0, 0.0, 0.0),
     ));

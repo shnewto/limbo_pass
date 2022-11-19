@@ -42,7 +42,7 @@ impl Movement {
     }
 }
 
-#[derive(Default, Component, Debug)]
+#[derive(Default, Component, Debug, Resource)]
 pub struct Movements(Vec<Movement>);
 
 pub fn get_movement(mut query: Query<&mut Movements>, keys: Res<Input<KeyCode>>) {
