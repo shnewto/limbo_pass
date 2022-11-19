@@ -10,7 +10,7 @@ use crate::form::{Form, Movements};
 
 #[derive(Resource)]
 pub struct SceneHandle {
-    pub handle: Handle<Scene>,
+    pub handle: Handle<Gltf>,
     pub is_loaded: bool,
 }
 
@@ -33,7 +33,6 @@ pub fn spawn(
         && asset_server.get_load_state(&scene_handle.handle) == LoadState::Loaded
     {
         let point_light_color_hex_string = "70FF00";
-        let gltf = gltf_assets.get(&scene_handle.handle).unwrap();
         if let Some(scenes_gltf) = gltf_assets.get(&scene_handle.handle) {
             let _foot_light = PointLightBundle {
                 point_light: PointLight {
