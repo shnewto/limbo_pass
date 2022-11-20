@@ -1,6 +1,15 @@
+use crate::scenes::SceneHandle;
+use crate::theme::ThemeState;
+use bevy::asset::LoadState;
 use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
 use smooth_bevy_cameras::controllers::orbit::{OrbitCameraBundle, OrbitCameraController};
+
+#[derive(Debug, Clone, Eq, PartialEq, Hash)]
+pub enum AppState {
+    Loading,
+    Running,
+}
 
 pub fn lighting(mut commands: Commands, mut ambient_light: ResMut<AmbientLight>) {
     let clear_color_hex_string = "0a0e17";
@@ -18,7 +27,7 @@ pub fn lighting(mut commands: Commands, mut ambient_light: ResMut<AmbientLight>)
             point_light_color_hex_string
         )
     });
-    commands.spawn_bundle(PointLightBundle {
+    commands.spawn(PointLightBundle {
         point_light: PointLight {
             color,
             range: 50.,
@@ -29,7 +38,7 @@ pub fn lighting(mut commands: Commands, mut ambient_light: ResMut<AmbientLight>)
         ..Default::default()
     });
 
-    commands.spawn_bundle(PointLightBundle {
+    commands.spawn(PointLightBundle {
         point_light: PointLight {
             color,
             range: 50.,
@@ -40,7 +49,7 @@ pub fn lighting(mut commands: Commands, mut ambient_light: ResMut<AmbientLight>)
         ..Default::default()
     });
 
-    commands.spawn_bundle(PointLightBundle {
+    commands.spawn(PointLightBundle {
         point_light: PointLight {
             color,
             range: 50.,
@@ -51,7 +60,7 @@ pub fn lighting(mut commands: Commands, mut ambient_light: ResMut<AmbientLight>)
         ..Default::default()
     });
 
-    commands.spawn_bundle(PointLightBundle {
+    commands.spawn(PointLightBundle {
         point_light: PointLight {
             color,
             range: 50.,
@@ -69,10 +78,28 @@ pub fn physics(mut physics_config: ResMut<RapierConfiguration>) {
 }
 
 pub fn camera(mut commands: Commands) {
-    commands.spawn_bundle(OrbitCameraBundle::new(
-        OrbitCameraController::default(),
-        PerspectiveCameraBundle::default(),
-        Vec3::new(-100.0, 60.0, 20.0),
-        Vec3::new(0.0, 0.0, 0.0),
-    ));
+    commands
+        .spawn(Camera3dBundle::default())
+        .insert(OrbitCameraBundle::new(
+            OrbitCameraController::default(),
+            Vec3::new(-100.0, 60.0, 20.0),
+            Vec3::new(0.0, 0.0, 0.0),
+        ));
+}
+
+pub fn check_loaded(
+    asset_server: Res<AssetServer>,
+    audio_state: Res<ThemeState>,
+    scene_handle: Res<SceneHandle>,
+    mut state: ResMut<State<AppState>>,
+) {
+    if LoadState::Loaded != asset_server.get_load_state(&audio_state.loop_handle) {
+        return;
+    }
+
+    if LoadState::Loaded != asset_server.get_load_state(&scene_handle.handle) {
+        return;
+    }
+
+    state.set(AppState::Running).unwrap()
 }

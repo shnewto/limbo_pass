@@ -11,25 +11,31 @@ mod theme;
 fn main() {
     App::new()
         .insert_resource(Msaa::default())
-        .insert_resource(WindowDescriptor {
-            title: "limbo pass".to_string(),
-            present_mode: PresentMode::Fifo,
-            ..default()
-        })
         .insert_resource(form::Movements::default())
-        .add_plugins(DefaultPlugins)
+        .add_state(setup::AppState::Loading)
+        .add_plugins(DefaultPlugins.set(WindowPlugin {
+            window: WindowDescriptor {
+                title: "limbo pass".to_string(),
+                present_mode: PresentMode::Fifo,
+                ..default()
+            },
+            ..default()
+        }))
         .add_plugin(LookTransformPlugin)
         .add_plugin(OrbitCameraPlugin::default())
         .add_plugin(AudioPlugin)
         .add_plugin(RapierPhysicsPlugin::<NoUserData>::default())
         // .add_plugin(RapierDebugRenderPlugin::default())
-        .add_startup_system(setup::camera)
-        .add_startup_system(setup::lighting)
-        .add_startup_system(setup::physics)
-        .add_startup_system(scenes::load)
-        .add_startup_system(theme::load)
-        .add_system_to_stage(CoreStage::PreUpdate, theme::play)
-        .add_system_to_stage(CoreStage::PreUpdate, scenes::spawn)
+        .add_system_set(SystemSet::on_enter(setup::AppState::Loading).with_system(setup::camera))
+        .add_system_set(SystemSet::on_enter(setup::AppState::Loading).with_system(setup::lighting))
+        .add_system_set(SystemSet::on_enter(setup::AppState::Loading).with_system(setup::physics))
+        .add_system_set(SystemSet::on_enter(setup::AppState::Loading).with_system(scenes::load))
+        .add_system_set(SystemSet::on_enter(setup::AppState::Loading).with_system(theme::load))
+        .add_system_set(
+            SystemSet::on_update(setup::AppState::Loading).with_system(setup::check_loaded),
+        )
+        .add_system_set(SystemSet::on_exit(setup::AppState::Loading).with_system(scenes::spawn))
+        .add_system_set(SystemSet::on_exit(setup::AppState::Loading).with_system(theme::play))
         .add_system(form::get_movement.label("get_movement"))
         .add_system(
             form::apply_movement
