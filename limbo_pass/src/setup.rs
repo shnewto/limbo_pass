@@ -1,16 +1,15 @@
+use crate::scenes::SceneHandle;
+use crate::theme::ThemeState;
 use bevy::asset::LoadState;
 use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
 use smooth_bevy_cameras::controllers::orbit::{OrbitCameraBundle, OrbitCameraController};
-use crate::scenes::SceneHandle;
-use crate::theme::ThemeState;
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub enum AppState {
     Loading,
     Running,
 }
-
 
 pub fn lighting(mut commands: Commands, mut ambient_light: ResMut<AmbientLight>) {
     let clear_color_hex_string = "0a0e17";
@@ -77,7 +76,6 @@ pub fn physics(mut physics_config: ResMut<RapierConfiguration>) {
     physics_config.gravity = Vec3::ZERO;
     physics_config.gravity.y = -100.0;
 }
-
 
 pub fn camera(mut commands: Commands) {
     commands

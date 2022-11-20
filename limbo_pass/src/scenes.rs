@@ -45,7 +45,7 @@ pub fn spawn(
 
         commands
             .spawn(SceneBundle {
-                scene: scenes_gltf.named_scenes["FORM"].clone_weak(),
+                scene: scenes_gltf.named_scenes["FORM"].clone(),
                 ..default()
             })
             .insert(TransformBundle::from(Transform::from_xyz(-45.0, 1.5, 0.0)))
@@ -68,8 +68,7 @@ pub fn spawn(
             .and_then(|gltf_mesh| gltf_mesh.primitives.get(0))
             .and_then(|terrain_primitive| meshes.get(&terrain_primitive.mesh));
 
-        let attribute_positions =
-            terrain_mesh.and_then(|m| m.attribute(Mesh::ATTRIBUTE_POSITION));
+        let attribute_positions = terrain_mesh.and_then(|m| m.attribute(Mesh::ATTRIBUTE_POSITION));
 
         if let (
             Some(VertexAttributeValues::Float32x3(vertex_values)),
@@ -88,7 +87,7 @@ pub fn spawn(
 
             commands
                 .spawn(SceneBundle {
-                    scene: scenes_gltf.named_scenes["TERRAIN"].clone_weak(),
+                    scene: scenes_gltf.named_scenes["TERRAIN"].clone(),
                     ..default()
                 })
                 .insert(Collider::trimesh(vertices, indices))

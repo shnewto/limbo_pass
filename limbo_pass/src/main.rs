@@ -31,7 +31,9 @@ fn main() {
         .add_system_set(SystemSet::on_enter(setup::AppState::Loading).with_system(setup::physics))
         .add_system_set(SystemSet::on_enter(setup::AppState::Loading).with_system(scenes::load))
         .add_system_set(SystemSet::on_enter(setup::AppState::Loading).with_system(theme::load))
-        .add_system_set(SystemSet::on_update(setup::AppState::Loading).with_system(setup::check_loaded))
+        .add_system_set(
+            SystemSet::on_update(setup::AppState::Loading).with_system(setup::check_loaded),
+        )
         .add_system_set(SystemSet::on_exit(setup::AppState::Loading).with_system(scenes::spawn))
         .add_system_set(SystemSet::on_exit(setup::AppState::Loading).with_system(theme::play))
         .add_system(form::get_movement.label("get_movement"))
