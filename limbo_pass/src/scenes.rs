@@ -44,7 +44,11 @@ pub fn spawn(
         };
 
         commands
-            .spawn(TransformBundle::from(Transform::from_xyz(-45.0, 1.5, 0.0)))
+            .spawn(SceneBundle {
+                scene: scenes_gltf.named_scenes["FORM"].clone_weak(),
+                ..default()
+            })
+            .insert(TransformBundle::from(Transform::from_xyz(-45.0, 1.5, 0.0)))
             .insert(RigidBody::Dynamic)
             .insert(LockedAxes::ROTATION_LOCKED_X | LockedAxes::ROTATION_LOCKED_Z)
             .insert(Collider::ball(2.3))
@@ -55,9 +59,6 @@ pub fn spawn(
                 // nothing special about these values, just played around until it felt like a ghost
                 thrust: Vec3::new(300.0, 100.0, 300.0),
                 drag: Vec3::new(250.0, 500.0, 250.0),
-            })
-            .with_children(|parent| {
-                parent.spawn(scenes_gltf.named_scenes["FORM"].clone());
             });
 
         let terrain_mesh_handle = &scenes_gltf.named_meshes["TERRAIN"];
@@ -86,11 +87,12 @@ pub fn spawn(
                 .collect();
 
             commands
-                .spawn(Collider::trimesh(vertices, indices))
-                .insert(ActiveEvents::COLLISION_EVENTS)
-                .with_children(|parent| {
-                    parent.spawn(scenes_gltf.named_scenes["TERRAIN"].clone());
-                });
+                .spawn(SceneBundle {
+                    scene: scenes_gltf.named_scenes["TERRAIN"].clone_weak(),
+                    ..default()
+                })
+                .insert(Collider::trimesh(vertices, indices))
+                .insert(ActiveEvents::COLLISION_EVENTS);
         }
     }
 }

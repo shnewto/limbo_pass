@@ -78,14 +78,16 @@ pub fn physics(mut physics_config: ResMut<RapierConfiguration>) {
     physics_config.gravity.y = -100.0;
 }
 
-pub fn camera(mut commands: Commands) {
-    commands.spawn(OrbitCameraBundle::new(
-        OrbitCameraController::default(),
-        Vec3::new(-100.0, 60.0, 20.0),
-        Vec3::new(0.0, 0.0, 0.0),
-    ));
-}
 
+pub fn camera(mut commands: Commands) {
+    commands
+        .spawn(Camera3dBundle::default())
+        .insert(OrbitCameraBundle::new(
+            OrbitCameraController::default(),
+            Vec3::new(-100.0, 60.0, 20.0),
+            Vec3::new(0.0, 0.0, 0.0),
+        ));
+}
 
 pub fn check_loaded(
     asset_server: Res<AssetServer>,
