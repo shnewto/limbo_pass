@@ -10,4 +10,3 @@ bevy_kira_audio = "0.13.0"
 
 [dependencies.bevy]
 version = "0.9.0"
-features = ["default", "render", "bevy_winit", "bevy_gltf", "bevy_scene"]
