@@ -5,8 +5,9 @@ use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
 use smooth_bevy_cameras::controllers::orbit::{OrbitCameraBundle, OrbitCameraController};
 
-#[derive(Debug, Clone, Eq, PartialEq, Hash)]
+#[derive(States, Debug, Clone, Eq, PartialEq, Hash, Default)]
 pub enum AppState {
+    #[default]
     Loading,
     Running,
 }
@@ -84,6 +85,7 @@ pub fn camera(mut commands: Commands) {
             OrbitCameraController::default(),
             Vec3::new(-100.0, 60.0, 20.0),
             Vec3::new(0.0, 0.0, 0.0),
+            Vec3::Y,
         ));
 }
 
@@ -91,7 +93,7 @@ pub fn check_loaded(
     asset_server: Res<AssetServer>,
     audio_state: Res<ThemeState>,
     scene_handle: Res<SceneHandle>,
-    mut state: ResMut<State<AppState>>,
+    mut state: ResMut<NextState<AppState>>,
 ) {
     if LoadState::Loaded != asset_server.get_load_state(&audio_state.loop_handle) {
         return;
@@ -101,5 +103,5 @@ pub fn check_loaded(
         return;
     }
 
-    state.set(AppState::Running).unwrap()
+    state.set(AppState::Running)
 }
