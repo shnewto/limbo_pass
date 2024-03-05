@@ -18,7 +18,7 @@ pub fn lighting(mut commands: Commands, mut ambient_light: ResMut<AmbientLight>)
         Color::hex(clear_color_hex_string)
             .unwrap_or_else(|_| panic!("couldn't make hex color from {}", clear_color_hex_string)),
     ));
-    ambient_light.brightness = 0.6;
+    ambient_light.brightness = 0.9;
     ambient_light.color = Color::SILVER;
     let point_light_intensity = 20000.0;
     let point_light_color_hex_string = "AB69E7";
@@ -86,7 +86,8 @@ pub fn camera(mut commands: Commands) {
             Vec3::new(-100.0, 60.0, 20.0),
             Vec3::new(0.0, 0.0, 0.0),
             Vec3::Y,
-        ));
+        ))
+        ;
 }
 
 pub fn check_loaded(
@@ -95,13 +96,10 @@ pub fn check_loaded(
     scene_handle: Res<SceneHandle>,
     mut state: ResMut<NextState<AppState>>,
 ) {
-    if LoadState::Loaded != asset_server.get_load_state(&audio_state.loop_handle) {
-        return;
+    if let (Some(LoadState::Loaded), Some(LoadState::Loaded)) = (
+        asset_server.get_load_state(&audio_state.loop_handle),
+        asset_server.get_load_state(&scene_handle.handle),
+    ) {
+        state.set(AppState::Running)
     }
-
-    if LoadState::Loaded != asset_server.get_load_state(&scene_handle.handle) {
-        return;
-    }
-
-    state.set(AppState::Running)
 }

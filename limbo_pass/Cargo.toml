@@ -1,12 +1,12 @@
 [package]
 name = "limbo_pass"
-version = "0.2.1"
+version = "0.2.2"
 edition = "2021"
 
 [dependencies]
-smooth-bevy-cameras = "0.8.0"
-bevy_rapier3d = "0.21.0"
-bevy_kira_audio = "0.15.0"
+smooth-bevy-cameras = "0.11.0"
+bevy_rapier3d = "0.25.0"
+bevy_kira_audio = "0.19.0"
 
 [dependencies.bevy]
-version = "0.10.0"
+version = "0.13.0"

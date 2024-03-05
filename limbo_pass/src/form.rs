@@ -45,28 +45,28 @@ impl Movement {
 #[derive(Default, Component, Debug, Resource)]
 pub struct Movements(Vec<Movement>);
 
-pub fn get_movement(mut query: Query<&mut Movements>, keys: Res<Input<KeyCode>>) {
+pub fn get_movement(mut query: Query<&mut Movements>, keys: Res<ButtonInput<KeyCode>>) {
     for mut movements in query.iter_mut() {
         movements.0.clear();
         let push_factor = 30.0;
         let turn_factor = 20.0;
-        if keys.pressed(KeyCode::W) || keys.pressed(KeyCode::Up) {
+        if keys.pressed(KeyCode::KeyW) || keys.pressed(KeyCode::ArrowUp) {
             movements.0.push(Movement::PushForward(push_factor))
         }
-        if keys.pressed(KeyCode::S) || keys.pressed(KeyCode::Down) {
+        if keys.pressed(KeyCode::KeyS) || keys.pressed(KeyCode::ArrowDown) {
             movements.0.push(Movement::PushBackward(push_factor))
         }
-        if keys.pressed(KeyCode::A) {
+        if keys.pressed(KeyCode::KeyA) {
             movements.0.push(Movement::PushLeft(push_factor))
         }
-        if keys.pressed(KeyCode::D) {
+        if keys.pressed(KeyCode::KeyD) {
             movements.0.push(Movement::PushRight(push_factor))
         }
 
-        if keys.pressed(KeyCode::Left) {
+        if keys.pressed(KeyCode::ArrowLeft) {
             movements.0.push(Movement::TurnLeft(turn_factor))
         }
-        if keys.pressed(KeyCode::Right) {
+        if keys.pressed(KeyCode::ArrowRight) {
             movements.0.push(Movement::TurnRight(turn_factor))
         }
 
