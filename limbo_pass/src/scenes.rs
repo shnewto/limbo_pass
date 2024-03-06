@@ -72,7 +72,7 @@ pub fn spawn(
 
         if let (
             Some(VertexAttributeValues::Float32x3(vertex_values)),
-            Some(Indices::U32(index_values)),
+            Some(Indices::U16(index_values)),
         ) = (attribute_positions, terrain_mesh.and_then(|m| m.indices()))
         {
             let vertices: Vec<Vect> = vertex_values
@@ -82,7 +82,7 @@ pub fn spawn(
 
             let indices: Vec<[u32; 3]> = index_values
                 .chunks(3)
-                .map(|chunk| [chunk[0], chunk[1], chunk[2]])
+                .map(|chunk| [chunk[0] as u32, chunk[1] as u32, chunk[2] as u32])
                 .collect();
 
             commands

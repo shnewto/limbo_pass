@@ -47,7 +47,7 @@ fn main() {
                 form::get_movement.run_if(in_state(AppState::Running)),
                 form::apply_movement
                     .after(form::get_movement)
-                    .run_if(in_state(AppState::Loading)),
+                    .run_if(in_state(AppState::Running)),
                 form::wrap_movement
                     .after(form::apply_movement)
                     .run_if(in_state(AppState::Running)),
