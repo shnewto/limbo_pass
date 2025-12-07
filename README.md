@@ -47,9 +47,13 @@ This creates a `dist/` directory with all the files needed for deployment.
 
 ### Cloudflare Pages
 
-- Cloudflare Pages will automatically build and deploy on every push to your main branch.
+Configure Cloudflare Pages with:
+- **Build command**: `bash build.sh`
+- **Build output directory**: `dist`
 
-- Alternatively, you can deploy manually using Wrangler
+Cloudflare Pages will automatically build and deploy on every push to your main branch.
+
+Alternatively, you can deploy manually using Wrangler:
 
 ```sh
 npm install -g wrangler

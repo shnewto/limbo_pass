@@ -5,6 +5,35 @@ set -e
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$PROJECT_ROOT"
 
+# Install Rust if not present
+if ! command -v cargo &> /dev/null; then
+    echo "Installing Rust..."
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable
+    export PATH="$HOME/.cargo/bin:$PATH"
+    source "$HOME/.cargo/env" 2>/dev/null || true
+fi
+
+# Ensure cargo is in PATH
+export PATH="$HOME/.cargo/bin:$PATH"
+
+# Install wasm32 target if not present
+if ! rustup target list --installed | grep -q "wasm32-unknown-unknown"; then
+    echo "Installing wasm32-unknown-unknown target..."
+    rustup target add wasm32-unknown-unknown
+fi
+
+# Install wasm-bindgen-cli if not present
+if ! command -v wasm-bindgen &> /dev/null; then
+    echo "Installing wasm-bindgen-cli..."
+    cargo install wasm-bindgen-cli --version 0.2.106
+fi
+
+# Install wasm-opt if not present
+if ! command -v wasm-opt &> /dev/null; then
+    echo "Installing wasm-opt..."
+    cargo install wasm-opt
+fi
+
 # Build the WASM binary with aggressive size optimizations
 echo "Building WASM binary with size optimizations..."
 # Use release for production, but can use debug for faster iteration
