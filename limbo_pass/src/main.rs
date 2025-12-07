@@ -16,7 +16,14 @@ fn main() {
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
                 title: "limbo pass".to_string(),
-                present_mode: PresentMode::Fifo,
+                // Fifo doesn't work on WASM, use AutoVsync instead
+                present_mode: if cfg!(target_arch = "wasm32") {
+                    PresentMode::AutoVsync
+                } else {
+                    PresentMode::Fifo
+                },
+                // Make window fill the viewport on WASM
+                fit_canvas_to_parent: cfg!(target_arch = "wasm32"),
                 ..default()
             }),
             ..default()
@@ -40,6 +47,7 @@ fn main() {
         .add_systems(OnExit(AppState::Loading), (
             scenes::spawn,
             theme::play,
+            setup::spawn_controls_text,
         ))
         .add_systems(Update, (
             form::get_movement.run_if(in_state(AppState::Running)),

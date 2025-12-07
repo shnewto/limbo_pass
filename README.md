@@ -12,6 +12,30 @@ build / run with the **release** flag so the overworld theme loads on time :)
 cargo run --release
 ```
 
+## run on the web (WASM)
+
+First, install the WASM target and wasm-server-runner:
+
+```sh
+rustup target install wasm32-unknown-unknown
+cargo install wasm-server-runner
+```
+
+Then run from the project root:
+
+```sh
+cargo run --target wasm32-unknown-unknown --release --bin limbo_pass
+```
+
+Or from the `limbo_pass` directory:
+
+```sh
+cd limbo_pass
+cargo run --target wasm32-unknown-unknown --release
+```
+
+This will automatically start a local web server and open the game in your browser.
+
 ## wander
 
 - space bar

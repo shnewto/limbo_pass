@@ -10,3 +10,4 @@ bevy_kira_audio = "0.24"
 
 [dependencies.bevy]
 version = "0.17"
+

@@ -82,3 +82,43 @@ pub fn check_loaded(
 
     state.set(AppState::Running)
 }
+
+pub fn spawn_controls_text(mut commands: Commands, asset_server: Res<AssetServer>) {
+    let controls_text = "wander
+--------------------
+space bar
+← ↑ ↓ →
+w a s d
+
+look
+--------------------
+hold ctrl + move mouse (orbit)
+scroll (zoom)
+right click (pan)";
+
+    // Load a font that supports Unicode arrows from assets
+    let font_handle = asset_server.load("font/NotoSansMono-Bold.ttf");
+
+    commands
+        .spawn(Node {
+            width: Val::Px(200.),
+            height: Val::Px(10.),
+            position_type: PositionType::Absolute,
+            justify_content: JustifyContent::FlexStart,
+            align_items: AlignItems::FlexStart,
+            left: Val::Px(10.),
+            top: Val::Px(10.),
+            ..default()
+        })
+        .with_children(|parent| {
+            parent.spawn((
+                Text(controls_text.to_string()),
+                TextFont {
+                    font: font_handle,
+                    font_size: 16.,
+                    ..default()
+                },
+                TextColor(Color::srgb(0.9, 0.9, 0.9)),
+            ));
+        });
+}

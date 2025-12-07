@@ -3,4 +3,5 @@
 members = [
     "limbo_pass",
 ]
+default-members = ["limbo_pass"]
 resolver = "2"
