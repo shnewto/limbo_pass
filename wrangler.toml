@@ -1,6 +1,5 @@
-name = "limbo-pass"
+name = "limbopass"
 compatibility_date = "2025-12-07"
 
-[site]
-bucket = "./dist"
+pages_build_output_dir = "./dist"
 
