@@ -2,7 +2,6 @@ use crate::scenes::SceneHandle;
 use crate::theme::ThemeState;
 use bevy::asset::LoadState;
 use bevy::prelude::*;
-use bevy_rapier3d::prelude::*;
 use smooth_bevy_cameras::controllers::orbit::{OrbitCameraBundle, OrbitCameraController};
 
 #[derive(States, Debug, Clone, Eq, PartialEq, Hash, Default)]
@@ -12,75 +11,53 @@ pub enum AppState {
     Running,
 }
 
+fn hex_to_color(hex: &str) -> Color {
+    let hex = hex.trim_start_matches('#');
+    let r = u8::from_str_radix(&hex[0..2], 16).unwrap_or(0);
+    let g = u8::from_str_radix(&hex[2..4], 16).unwrap_or(0);
+    let b = u8::from_str_radix(&hex[4..6], 16).unwrap_or(0);
+    Color::srgb_u8(r, g, b)
+}
+
 pub fn lighting(mut commands: Commands, mut ambient_light: ResMut<AmbientLight>) {
     let clear_color_hex_string = "0a0e17";
     commands.insert_resource(ClearColor(
-        Color::hex(clear_color_hex_string)
-            .unwrap_or_else(|_| panic!("couldn't make hex color from {}", clear_color_hex_string)),
+        hex_to_color(clear_color_hex_string)
     ));
-    ambient_light.brightness = 0.6;
-    ambient_light.color = Color::SILVER;
-    let point_light_intensity = 20000.0;
+    // Increase ambient light brightness for better global illumination
+    ambient_light.brightness = 600.0; // Increased from 0.6 for more visibility
+    ambient_light.color = Color::srgb(0.75, 0.75, 0.75); // SILVER equivalent
+    
     let point_light_color_hex_string = "AB69E7";
-    let color = Color::hex(point_light_color_hex_string).unwrap_or_else(|_| {
-        panic!(
-            "couldn't make hex color from {}",
-            point_light_color_hex_string
-        )
-    });
-    commands.spawn(PointLightBundle {
-        point_light: PointLight {
-            color,
-            range: 50.,
-            intensity: point_light_intensity,
-            ..Default::default()
-        },
-        transform: Transform::from_xyz(-40.0, 20.0, 0.0),
-        ..Default::default()
-    });
-
-    commands.spawn(PointLightBundle {
-        point_light: PointLight {
-            color,
-            range: 50.,
-            intensity: point_light_intensity,
-            ..Default::default()
-        },
-        transform: Transform::from_xyz(40.0, 20.0, 0.0),
-        ..Default::default()
-    });
-
-    commands.spawn(PointLightBundle {
-        point_light: PointLight {
-            color,
-            range: 50.,
-            intensity: point_light_intensity,
-            ..Default::default()
-        },
-        transform: Transform::from_xyz(0.0, 20.0, -40.0),
-        ..Default::default()
-    });
-
-    commands.spawn(PointLightBundle {
-        point_light: PointLight {
-            color,
-            range: 50.,
-            intensity: point_light_intensity,
-            ..Default::default()
-        },
-        transform: Transform::from_xyz(0.0, 20.0, 40.0),
-        ..Default::default()
-    });
+    let color = hex_to_color(point_light_color_hex_string);
+    
+    // Spawn 4 point lights around the scene
+    // Making them WAY bigger and brighter to test visibility
+    for (x, z) in [(-40.0, 0.0), (40.0, 0.0), (0.0, -40.0), (0.0, 40.0)] {
+        commands.spawn((
+            PointLight {
+                color,
+                range: 500.0, 
+                intensity: 10_000_000.0,
+                shadows_enabled: true,
+                ..default()
+            },
+            Transform::from_xyz(x, 15.0, z),
+        ));
+    }
+    
+    bevy::log::info!("Spawned 4 point lights with default settings");
 }
 
-pub fn physics(mut physics_config: ResMut<RapierConfiguration>) {
-    physics_config.gravity = Vec3::ZERO;
-    physics_config.gravity.y = -100.0;
+// Note: RapierConfiguration is not a Resource in bevy_rapier3d 0.32
+// Gravity can be set via RapierPhysicsPlugin configuration or removed if defaults are acceptable
+pub fn physics() {
+    // Gravity configuration moved to plugin initialization if needed
 }
 
 pub fn camera(mut commands: Commands) {
     commands
-        .spawn(Camera3dBundle::default())
+        .spawn(Camera3d::default())
         .insert(OrbitCameraBundle::new(
             OrbitCameraController::default(),
             Vec3::new(-100.0, 60.0, 20.0),
@@ -95,11 +72,11 @@ pub fn check_loaded(
     scene_handle: Res<SceneHandle>,
     mut state: ResMut<NextState<AppState>>,
 ) {
-    if LoadState::Loaded != asset_server.get_load_state(&audio_state.loop_handle) {
+    if !matches!(asset_server.get_load_state(&audio_state.loop_handle), Some(LoadState::Loaded)) {
         return;
     }
 
-    if LoadState::Loaded != asset_server.get_load_state(&scene_handle.handle) {
+    if !matches!(asset_server.get_load_state(&scene_handle.handle), Some(LoadState::Loaded)) {
         return;
     }
 

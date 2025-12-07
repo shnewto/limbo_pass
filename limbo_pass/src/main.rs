@@ -1,4 +1,4 @@
-use bevy::{prelude::*, window::PresentMode};
+use bevy::{light::PointLightShadowMap, prelude::*, window::PresentMode};
 use bevy_kira_audio::AudioPlugin;
 use bevy_rapier3d::prelude::*;
 use smooth_bevy_cameras::{controllers::orbit::OrbitCameraPlugin, LookTransformPlugin};
@@ -11,9 +11,8 @@ mod theme;
 
 fn main() {
     App::new()
-        .insert_resource(Msaa::default())
         .insert_resource(form::Movements::default())
-        .add_state::<AppState>()
+        .insert_resource(PointLightShadowMap { size: 2048 })
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
                 title: "limbo pass".to_string(),
@@ -22,24 +21,30 @@ fn main() {
             }),
             ..default()
         }))
-        .add_plugin(LookTransformPlugin)
-        .add_plugin(OrbitCameraPlugin::default())
-        .add_plugin(AudioPlugin)
-        .add_plugin(RapierPhysicsPlugin::<NoUserData>::default())
+        .add_plugins(LookTransformPlugin)
+        .add_plugins(OrbitCameraPlugin::default())
+        .add_plugins(AudioPlugin)
+        .add_plugins(RapierPhysicsPlugin::<NoUserData>::default())
         // .add_plugin(RapierDebugRenderPlugin::default())
-        .add_systems((
-            setup::camera.in_schedule(OnEnter(AppState::Loading)),
-            setup::lighting.in_schedule(OnEnter(AppState::Loading)),
-            setup::physics.in_schedule(OnEnter(AppState::Loading)),
-            scenes::load.in_schedule(OnEnter(AppState::Loading)),
-            theme::load.in_schedule(OnEnter(AppState::Loading)),
+        .init_state::<AppState>()
+        .add_systems(OnEnter(AppState::Loading), (
+            setup::camera,
+            setup::lighting,
+            setup::physics,
+            scenes::load,
+            theme::load,
+        ))
+        .add_systems(Update, (
             setup::check_loaded.run_if(in_state(AppState::Loading)),
-            scenes::spawn.in_schedule(OnExit(AppState::Loading)),
-            theme::play.in_schedule(OnExit(AppState::Loading)),
+        ))
+        .add_systems(OnExit(AppState::Loading), (
+            scenes::spawn,
+            theme::play,
+        ))
+        .add_systems(Update, (
             form::get_movement.run_if(in_state(AppState::Running)),
             form::apply_movement.after(form::get_movement).run_if(in_state(AppState::Running)),
             form::wrap_movement.after(form::apply_movement).run_if(in_state(AppState::Running)),
-
         ))
         .run();
 }

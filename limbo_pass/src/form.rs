@@ -45,28 +45,28 @@ impl Movement {
 #[derive(Default, Component, Debug, Resource)]
 pub struct Movements(Vec<Movement>);
 
-pub fn get_movement(mut query: Query<&mut Movements>, keys: Res<Input<KeyCode>>) {
+pub fn get_movement(mut query: Query<&mut Movements>, keys: Res<ButtonInput<KeyCode>>) {
     for mut movements in query.iter_mut() {
         movements.0.clear();
         let push_factor = 30.0;
         let turn_factor = 20.0;
-        if keys.pressed(KeyCode::W) || keys.pressed(KeyCode::Up) {
+        if keys.pressed(KeyCode::KeyW) || keys.pressed(KeyCode::ArrowUp) {
             movements.0.push(Movement::PushForward(push_factor))
         }
-        if keys.pressed(KeyCode::S) || keys.pressed(KeyCode::Down) {
+        if keys.pressed(KeyCode::KeyS) || keys.pressed(KeyCode::ArrowDown) {
             movements.0.push(Movement::PushBackward(push_factor))
         }
-        if keys.pressed(KeyCode::A) {
+        if keys.pressed(KeyCode::KeyA) {
             movements.0.push(Movement::PushLeft(push_factor))
         }
-        if keys.pressed(KeyCode::D) {
+        if keys.pressed(KeyCode::KeyD) {
             movements.0.push(Movement::PushRight(push_factor))
         }
 
-        if keys.pressed(KeyCode::Left) {
+        if keys.pressed(KeyCode::ArrowLeft) {
             movements.0.push(Movement::TurnLeft(turn_factor))
         }
-        if keys.pressed(KeyCode::Right) {
+        if keys.pressed(KeyCode::ArrowRight) {
             movements.0.push(Movement::TurnRight(turn_factor))
         }
 
@@ -86,7 +86,7 @@ pub fn apply_movement(
     )>,
 ) {
     if let Ok((movements, form, global_transform, mut rb_forces, rb_velocities)) =
-        form_query.get_single_mut()
+        form_query.single_mut()
     {
         let mut forces = Vec3::new(0.0, 0.0, 0.0);
         let mut torques = Vec3::new(0.0, 0.0, 0.0);
@@ -96,7 +96,7 @@ pub fn apply_movement(
             torques += movement.as_ang_vec() * form.thrust;
         }
 
-        let local_to_global = global_transform.compute_matrix();
+        let local_to_global = global_transform.to_matrix();
         forces = local_to_global.transform_vector3(forces);
         torques = local_to_global.transform_vector3(torques);
 
@@ -111,7 +111,7 @@ pub fn apply_movement(
 }
 
 pub fn wrap_movement(mut form_query: Query<(&Form, &mut Transform)>) {
-    if let Ok((_form, mut transform)) = form_query.get_single_mut() {
+    if let Ok((_form, mut transform)) = form_query.single_mut() {
         let max_terrain_coord = 50.0;
         let min_terrain_coord = -50.0;
         let current_x = transform.translation.x;
