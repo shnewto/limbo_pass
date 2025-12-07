@@ -57,11 +57,13 @@ pub fn spawn(
                 Velocity::zero(),
                 ExternalForce::default(),
                 Movements::default(),
-                GravityScale(10.0), // Make gravity 2x stronger for faster falling
+                GravityScale(3.0), // Increased from 2.0 for faster falling 
                 Form {
                     // nothing special about these values, just played around until it felt like a ghost
-                    thrust: Vec3::new(300.0, 100.0, 300.0),
-                    drag: Vec3::new(250.0, 500.0, 250.0),
+                    // Reduced Y drag so falling is faster, but lift thrust (90.0 * 100.0 = 9000) still works
+                    // Reduced X/Z thrust to slow horizontal movement
+                    thrust: Vec3::new(200.0, 100.0, 200.0), // Reduced from 300.0 to 200.0 for X/Z
+                    drag: Vec3::new(250.0, 300.0, 250.0), // Reduced Y drag from 500.0 to 300.0
                 },
             ))
             .id();

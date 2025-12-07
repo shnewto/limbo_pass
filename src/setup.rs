@@ -4,10 +4,17 @@ use bevy::asset::LoadState;
 use bevy::prelude::*;
 use smooth_bevy_cameras::controllers::orbit::{OrbitCameraBundle, OrbitCameraController};
 
+#[derive(Component)]
+pub(crate) struct LoadingScreen;
+
+#[derive(Component)]
+pub(crate) struct MenuScreen;
+
 #[derive(States, Debug, Clone, Eq, PartialEq, Hash, Default)]
 pub enum AppState {
     #[default]
     Loading,
+    Menu,
     Running,
 }
 
@@ -80,7 +87,111 @@ pub fn check_loaded(
         return;
     }
 
-    state.set(AppState::Running)
+    // Assets loaded, transition to menu
+    state.set(AppState::Menu)
+}
+
+pub fn spawn_loading_screen(mut commands: Commands, asset_server: Res<AssetServer>) {
+    // Use the same monospace font as the menu for consistency
+    let font_handle = asset_server.load("font/NotoSansMono-Bold.ttf");
+    
+    commands
+        .spawn((
+            Node {
+                width: Val::Percent(100.),
+                height: Val::Percent(100.),
+                justify_content: JustifyContent::Center,
+                align_items: AlignItems::Center,
+                flex_direction: FlexDirection::Column,
+                ..default()
+            },
+            LoadingScreen,
+        ))
+        .with_children(|parent| {
+            parent.spawn((
+                Text("limbo pass is loading...".to_string()),
+                TextFont {
+                    font: font_handle,
+                    font_size: 48.,
+                    ..default()
+                },
+                TextColor(Color::srgb(0.9, 0.9, 0.9)),
+            ));
+        });
+}
+
+pub fn spawn_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
+    let font_handle = asset_server.load("font/NotoSansMono-Bold.ttf");
+    
+    commands
+        .spawn((
+            Node {
+                width: Val::Percent(100.),
+                height: Val::Percent(100.),
+                justify_content: JustifyContent::Center,
+                align_items: AlignItems::Center,
+                flex_direction: FlexDirection::Column,
+                ..default()
+            },
+            MenuScreen,
+        ))
+        .with_children(|parent| {
+            // "head to limbo pass" button - just text, no box
+            parent
+                .spawn((
+                    Button,
+                ))
+                .with_children(|button| {
+                    button.spawn((
+                        Text("head to limbo pass".to_string()),
+                        TextFont {
+                            font: font_handle,
+                            font_size: 48.,
+                            ..default()
+                        },
+                        TextColor(Color::srgb(0.9, 0.9, 0.9)),
+                    ));
+                });
+        });
+}
+
+pub fn handle_play_button(
+    mut interaction_query: Query<(&Interaction, &Children), (Changed<Interaction>, With<Button>)>,
+    mut text_query: Query<&mut TextColor>,
+    mut state: ResMut<NextState<AppState>>,
+) {
+    let purple_color = hex_to_color("AB69E7"); // Dark purple from point lights
+    
+    for (interaction, children) in interaction_query.iter_mut() {
+        // Get the first child (the text entity)
+        if let Some(child) = children.first().copied() {
+            if let Ok(mut text_color) = text_query.get_mut(child) {
+                match *interaction {
+                    Interaction::Pressed => {
+                        state.set(AppState::Running);
+                    }
+                    Interaction::Hovered => {
+                        *text_color = TextColor(purple_color); // Dark purple on hover
+                    }
+                    Interaction::None => {
+                        *text_color = TextColor(Color::srgb(0.9, 0.9, 0.9)); // Normal color
+                    }
+                }
+            }
+        }
+    }
+}
+
+pub fn cleanup_loading_screen(mut commands: Commands, query: Query<Entity, With<LoadingScreen>>) {
+    for entity in query.iter() {
+        commands.entity(entity).despawn();
+    }
+}
+
+pub fn cleanup_menu(mut commands: Commands, query: Query<Entity, With<MenuScreen>>) {
+    for entity in query.iter() {
+        commands.entity(entity).despawn();
+    }
 }
 
 pub fn spawn_controls_text(mut commands: Commands, asset_server: Res<AssetServer>) {

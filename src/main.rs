@@ -41,11 +41,24 @@ fn main() {
             setup::physics,
             scenes::load,
             theme::load,
+            setup::spawn_loading_screen,
         ))
         .add_systems(Update, (
             setup::check_loaded.run_if(in_state(AppState::Loading)),
         ))
         .add_systems(OnExit(AppState::Loading), (
+            setup::cleanup_loading_screen,
+        ))
+        .add_systems(OnEnter(AppState::Menu), (
+            setup::spawn_menu,
+        ))
+        .add_systems(Update, (
+            setup::handle_play_button.run_if(in_state(AppState::Menu)),
+        ))
+        .add_systems(OnExit(AppState::Menu), (
+            setup::cleanup_menu,
+        ))
+        .add_systems(OnEnter(AppState::Running), (
             scenes::spawn,
             theme::play,
             setup::spawn_controls_text,
