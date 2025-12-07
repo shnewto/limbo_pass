@@ -5,9 +5,15 @@ set -e
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$PROJECT_ROOT"
 
-# Build the WASM binary
-echo "Building WASM binary..."
-cargo build --target wasm32-unknown-unknown --release --bin limbo_pass
+# Build the WASM binary with aggressive size optimizations
+echo "Building WASM binary with size optimizations..."
+# Use release for production, but can use debug for faster iteration
+if [ "${BUILD_MODE:-release}" = "debug" ]; then
+    cargo build --target wasm32-unknown-unknown --bin limbo_pass
+else
+    RUSTFLAGS="-C opt-level=z -C link-arg=-zstack-size=8388608" \
+    cargo build --target wasm32-unknown-unknown --release --bin limbo_pass
+fi
 
 # Create output directory in limbo_pass
 OUTPUT_DIR="limbo_pass/dist"
@@ -35,6 +41,29 @@ wasm-bindgen \
     --out-dir "$OUTPUT_DIR" \
     --no-typescript \
     "$WASM_FILE"
+
+# Compress WASM file to reduce size (Cloudflare Pages has a 25MB limit)
+echo "Optimizing WASM file..."
+ORIGINAL_SIZE=$(du -h "$OUTPUT_DIR/limbo_pass_bg.wasm" | cut -f1)
+if command -v wasm-opt &> /dev/null; then
+    # Use aggressive optimization: -Oz (optimize for size) with additional flags
+    # --enable-bulk-memory is needed for some WASM features
+    wasm-opt -Oz --strip-debug --strip-producers --enable-bulk-memory -o "$OUTPUT_DIR/limbo_pass_bg.wasm.opt" "$OUTPUT_DIR/limbo_pass_bg.wasm"
+    mv "$OUTPUT_DIR/limbo_pass_bg.wasm.opt" "$OUTPUT_DIR/limbo_pass_bg.wasm"
+    OPTIMIZED_SIZE=$(du -h "$OUTPUT_DIR/limbo_pass_bg.wasm" | cut -f1)
+    echo "WASM optimized: $ORIGINAL_SIZE -> $OPTIMIZED_SIZE"
+    
+    # Check if still too large
+    SIZE_BYTES=$(stat -f%z "$OUTPUT_DIR/limbo_pass_bg.wasm" 2>/dev/null || stat -c%s "$OUTPUT_DIR/limbo_pass_bg.wasm" 2>/dev/null)
+    SIZE_MB=$((SIZE_BYTES / 1024 / 1024))
+    if [ "$SIZE_MB" -gt 25 ]; then
+        echo "Warning: WASM file is still ${SIZE_MB}MB (limit is 25MB)"
+        echo "Note: You may need to reduce dependencies or use code splitting to get under the limit"
+    fi
+else
+    echo "Warning: wasm-opt not found. Install it with: cargo install wasm-opt"
+    echo "WASM file size: $ORIGINAL_SIZE"
+fi
 
 # Copy and update index.html
 echo "Copying index.html..."

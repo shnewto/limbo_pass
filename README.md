@@ -59,7 +59,8 @@ This creates a `dist/` directory with all the files needed for deployment.
    - Select your repository
 
 1. **Configure build settings**:
-   - **Build command**: `./build.sh`
+   - **Build command**: `bash build.sh`
+   - **Build output directory**: `limbo_pass/dist`
 
 1. **Deploy**: Cloudflare Pages will automatically build and deploy on every push to your main branch.
 
@@ -67,8 +68,7 @@ Alternatively, you can deploy manually using Wrangler:
 
 ```sh
 npm install -g wrangler
-cd limbo_pass
-wrangler pages deploy dist
+wrangler pages deploy limbo_pass/dist
 ```
 
 ## wander
