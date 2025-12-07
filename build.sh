@@ -9,28 +9,28 @@ cd "$PROJECT_ROOT"
 echo "Building WASM binary with size optimizations..."
 # Use release for production, but can use debug for faster iteration
 if [ "${BUILD_MODE:-release}" = "debug" ]; then
-    cargo build --target wasm32-unknown-unknown --bin limbo_pass
+    cargo build --target wasm32-unknown-unknown
 else
     RUSTFLAGS="-C opt-level=z -C link-arg=-zstack-size=8388608" \
-    cargo build --target wasm32-unknown-unknown --release --bin limbo_pass
+    cargo build --target wasm32-unknown-unknown --release
 fi
 
-# Create output directory in limbo_pass
-OUTPUT_DIR="limbo_pass/dist"
+# Create output directory
+OUTPUT_DIR="dist"
 mkdir -p "$OUTPUT_DIR"
 
 # Copy assets
 echo "Copying assets..."
-cp -r limbo_pass/assets "$OUTPUT_DIR/"
+cp -r assets "$OUTPUT_DIR/"
 
-# Find the WASM file (could be in parent or child target directory)
-WASM_FILE=""
-if [[ -f "target/wasm32-unknown-unknown/release/limbo_pass.wasm" ]]; then
-    WASM_FILE="target/wasm32-unknown-unknown/release/limbo_pass.wasm"
-elif [[ -f "limbo_pass/target/wasm32-unknown-unknown/release/limbo_pass.wasm" ]]; then
-    WASM_FILE="limbo_pass/target/wasm32-unknown-unknown/release/limbo_pass.wasm"
-else
-    echo "Error: Could not find limbo_pass.wasm"
+# Find the WASM file
+WASM_FILE="target/wasm32-unknown-unknown/release/limbo_pass.wasm"
+if [ "${BUILD_MODE:-release}" = "debug" ]; then
+    WASM_FILE="target/wasm32-unknown-unknown/debug/limbo_pass.wasm"
+fi
+
+if [[ ! -f "$WASM_FILE" ]]; then
+    echo "Error: Could not find $WASM_FILE"
     exit 1
 fi
 
@@ -47,8 +47,8 @@ echo "Optimizing WASM file..."
 ORIGINAL_SIZE=$(du -h "$OUTPUT_DIR/limbo_pass_bg.wasm" | cut -f1)
 if command -v wasm-opt &> /dev/null; then
     # Use aggressive optimization: -Oz (optimize for size) with additional flags
-    # --enable-bulk-memory is needed for some WASM features
-    wasm-opt -Oz --strip-debug --strip-producers --enable-bulk-memory -o "$OUTPUT_DIR/limbo_pass_bg.wasm.opt" "$OUTPUT_DIR/limbo_pass_bg.wasm"
+    # Enable required WASM features for validation
+    wasm-opt -Oz --strip-debug --strip-producers --enable-bulk-memory --enable-nontrapping-float-to-int -o "$OUTPUT_DIR/limbo_pass_bg.wasm.opt" "$OUTPUT_DIR/limbo_pass_bg.wasm"
     mv "$OUTPUT_DIR/limbo_pass_bg.wasm.opt" "$OUTPUT_DIR/limbo_pass_bg.wasm"
     OPTIMIZED_SIZE=$(du -h "$OUTPUT_DIR/limbo_pass_bg.wasm" | cut -f1)
     echo "WASM optimized: $ORIGINAL_SIZE -> $OPTIMIZED_SIZE"
@@ -67,7 +67,7 @@ fi
 
 # Copy and update index.html
 echo "Copying index.html..."
-cp limbo_pass/index.html "$OUTPUT_DIR/"
+cp index.html "$OUTPUT_DIR/"
 # Update the import path in index.html to match the generated file
 if [[ "$OSTYPE" == "darwin"* ]]; then
     # macOS sed
@@ -78,8 +78,8 @@ else
 fi
 
 # Copy _redirects file if it exists
-if [[ -f "limbo_pass/_redirects" ]]; then
-    cp limbo_pass/_redirects "$OUTPUT_DIR/"
+if [[ -f "_redirects" ]]; then
+    cp _redirects "$OUTPUT_DIR/"
 fi
 
 echo "Build complete! Output in $OUTPUT_DIR/"

@@ -49,10 +49,10 @@ pub fn lighting(mut commands: Commands, mut ambient_light: ResMut<AmbientLight>)
     bevy::log::info!("Spawned 4 point lights with default settings");
 }
 
-// Note: RapierConfiguration is not a Resource in bevy_rapier3d 0.32
-// Gravity can be set via RapierPhysicsPlugin configuration or removed if defaults are acceptable
+// Gravity scale will be applied to the form entity in scenes.rs
+// Using GravityScale component on the rigid body to make it fall faster
 pub fn physics() {
-    // Gravity configuration moved to plugin initialization if needed
+    // Gravity scale is set on the form entity in scenes::spawn
 }
 
 pub fn camera(mut commands: Commands) {

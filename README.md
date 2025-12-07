@@ -21,16 +21,9 @@ rustup target install wasm32-unknown-unknown
 cargo install wasm-server-runner
 ```
 
-Then run from the project root:
+Run from the project root:
 
 ```sh
-cargo run --target wasm32-unknown-unknown --release --bin limbo_pass
-```
-
-Or from the `limbo_pass` directory:
-
-```sh
-cd limbo_pass
 cargo run --target wasm32-unknown-unknown --release
 ```
 
@@ -52,23 +45,15 @@ Then build for production:
 
 This creates a `dist/` directory with all the files needed for deployment.
 
-### Cloudflare Pages Setup
+### Cloudflare Pages
 
-1. **Connect your repository** to Cloudflare Pages:
-   - Go to [Cloudflare Dashboard](https://dash.cloudflare.com/) → Workers & Pages → Create application → Pages → Connect to Git
-   - Select your repository
+- Cloudflare Pages will automatically build and deploy on every push to your main branch.
 
-1. **Configure build settings**:
-   - **Build command**: `bash build.sh`
-   - **Build output directory**: `limbo_pass/dist`
-
-1. **Deploy**: Cloudflare Pages will automatically build and deploy on every push to your main branch.
-
-Alternatively, you can deploy manually using Wrangler:
+- Alternatively, you can deploy manually using Wrangler
 
 ```sh
 npm install -g wrangler
-wrangler pages deploy limbo_pass/dist
+wrangler pages deploy dist
 ```
 
 ## wander
@@ -96,7 +81,7 @@ mostly this little game was me figuring out how to use blender assets in bevy an
 
 some details on implementation on the blender side. in case you're curious or looking for examples of how to do this sort of stuff yourself like i was at every step of the way.
 
-- the scenes used for this project live in `blend/limbo_pass.blend` and are exported to `limbo_pass/assets/gltf/limbo_pass.gltf`
+- the scenes used for this project live in `blend/limbo_pass.blend` and are exported to `assets/gltf/limbo_pass.gltf`
 - this project gets both scenes and the terrain mesh by name so make sure you keep track of those :)
 - the ghost's origin is somewhere near the object's center of mass but I toggled it a bit. on the bevy / rapier3d side, the scene shares a transform with a sphere collider and because the ghost's shape is irregular it needed a bit of adjusting to match the collider's vertical area
 - i ended up doing some... cursed looking things i probably didn't have to to get the terrain's vertices and indexes for the trimesh collider, if you can point me at a better solution I'd be glad for it :)

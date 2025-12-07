@@ -1,4 +1,4 @@
-use bevy::{asset::AssetPlugin, light::PointLightShadowMap, prelude::*, window::PresentMode};
+use bevy::{light::PointLightShadowMap, prelude::*, window::PresentMode};
 use bevy_kira_audio::AudioPlugin;
 use bevy_rapier3d::prelude::*;
 use smooth_bevy_cameras::{controllers::orbit::OrbitCameraPlugin, LookTransformPlugin};
@@ -14,10 +14,6 @@ fn main() {
         .insert_resource(form::Movements::default())
         .insert_resource(PointLightShadowMap { size: 2048 })
         .add_plugins(DefaultPlugins
-            .set(AssetPlugin {
-                file_path: "assets".into(),
-                ..default()
-            })
             .set(WindowPlugin {
             primary_window: Some(Window {
                 title: "limbo pass".to_string(),

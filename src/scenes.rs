@@ -57,6 +57,7 @@ pub fn spawn(
                 Velocity::zero(),
                 ExternalForce::default(),
                 Movements::default(),
+                GravityScale(10.0), // Make gravity 2x stronger for faster falling
                 Form {
                     // nothing special about these values, just played around until it felt like a ghost
                     thrust: Vec3::new(300.0, 100.0, 300.0),
