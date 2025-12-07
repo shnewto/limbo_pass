@@ -36,6 +36,41 @@ cargo run --target wasm32-unknown-unknown --release
 
 This will automatically start a local web server and open the game in your browser.
 
+## deploy to cloudflare pages
+
+First, install wasm-bindgen-cli:
+
+```sh
+cargo install wasm-bindgen-cli --version 0.2.106
+```
+
+Then build for production:
+
+```sh
+./build.sh
+```
+
+This creates a `dist/` directory with all the files needed for deployment.
+
+### Cloudflare Pages Setup
+
+1. **Connect your repository** to Cloudflare Pages:
+   - Go to [Cloudflare Dashboard](https://dash.cloudflare.com/) → Workers & Pages → Create application → Pages → Connect to Git
+   - Select your repository
+
+1. **Configure build settings**:
+   - **Build command**: `./build.sh`
+
+1. **Deploy**: Cloudflare Pages will automatically build and deploy on every push to your main branch.
+
+Alternatively, you can deploy manually using Wrangler:
+
+```sh
+npm install -g wrangler
+cd limbo_pass
+wrangler pages deploy dist
+```
+
 ## wander
 
 - space bar
