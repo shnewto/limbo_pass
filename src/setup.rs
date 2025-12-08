@@ -2,6 +2,7 @@ use crate::scenes::SceneHandle;
 use crate::theme::ThemeState;
 use bevy::asset::LoadState;
 use bevy::prelude::*;
+use bevy_kira_audio::AudioControl;
 use smooth_bevy_cameras::controllers::orbit::{OrbitCameraBundle, OrbitCameraController};
 
 #[derive(Component)]
@@ -9,6 +10,14 @@ pub(crate) struct LoadingScreen;
 
 #[derive(Component)]
 pub(crate) struct MenuScreen;
+
+#[derive(Component)]
+pub(crate) struct MusicToggleButton;
+
+#[derive(Component)]
+pub(crate) struct MusicToggleText;
+
+type ButtonInteractionQuery<'w, 's> = Query<'w, 's, (&'static Interaction, &'static Children), (Changed<Interaction>, With<Button>)>;
 
 #[derive(States, Debug, Clone, Eq, PartialEq, Hash, Default)]
 pub enum AppState {
@@ -156,7 +165,7 @@ pub fn spawn_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
 }
 
 pub fn handle_play_button(
-    mut interaction_query: Query<(&Interaction, &Children), (Changed<Interaction>, With<Button>)>,
+    mut interaction_query: ButtonInteractionQuery,
     mut text_query: Query<&mut TextColor>,
     mut state: ResMut<NextState<AppState>>,
 ) {
@@ -164,18 +173,18 @@ pub fn handle_play_button(
     
     for (interaction, children) in interaction_query.iter_mut() {
         // Get the first child (the text entity)
-        if let Some(child) = children.first().copied() {
-            if let Ok(mut text_color) = text_query.get_mut(child) {
-                match *interaction {
-                    Interaction::Pressed => {
-                        state.set(AppState::Running);
-                    }
-                    Interaction::Hovered => {
-                        *text_color = TextColor(purple_color); // Dark purple on hover
-                    }
-                    Interaction::None => {
-                        *text_color = TextColor(Color::srgb(0.9, 0.9, 0.9)); // Normal color
-                    }
+        if let Some(child) = children.first().copied()
+            && let Ok(mut text_color) = text_query.get_mut(child)
+        {
+            match *interaction {
+                Interaction::Pressed => {
+                    state.set(AppState::Running);
+                }
+                Interaction::Hovered => {
+                    *text_color = TextColor(purple_color); // Dark purple on hover
+                }
+                Interaction::None => {
+                    *text_color = TextColor(Color::srgb(0.9, 0.9, 0.9)); // Normal color
                 }
             }
         }
@@ -225,11 +234,106 @@ right click (pan)";
             parent.spawn((
                 Text(controls_text.to_string()),
                 TextFont {
-                    font: font_handle,
+                    font: font_handle.clone(),
                     font_size: 16.,
                     ..default()
                 },
                 TextColor(Color::srgb(0.9, 0.9, 0.9)),
             ));
         });
+
+    // Spawn music toggle button in top right
+    commands
+        .spawn((
+            Node {
+                width: Val::Px(120.),
+                height: Val::Px(40.),
+                position_type: PositionType::Absolute,
+                justify_content: JustifyContent::Center,
+                align_items: AlignItems::Center,
+                right: Val::Px(10.),
+                top: Val::Px(10.),
+                ..default()
+            },
+            MusicToggleButton,
+        ))
+        .with_children(|parent| {
+            parent
+                .spawn((
+                    Button,
+                    BackgroundColor(Color::NONE),
+                ))
+                .with_children(|button| {
+                    button.spawn((
+                        Text("music".to_string()),
+                        TextFont {
+                            font: font_handle.clone(),
+                            font_size: 16.,
+                            ..default()
+                        },
+                        TextColor(Color::srgb(0.9, 0.9, 0.9)),
+                        MusicToggleText,
+                    ));
+                });
+        });
+}
+
+pub fn handle_music_toggle(
+    mut interaction_query: ButtonInteractionQuery,
+    mut text_color_query: Query<&mut TextColor, With<MusicToggleText>>,
+    mut audio_state: ResMut<crate::theme::ThemeState>,
+    audio: Res<bevy_kira_audio::Audio>,
+    mut audio_instances: ResMut<Assets<bevy_kira_audio::AudioInstance>>,
+) {
+    for (interaction, children) in interaction_query.iter_mut() {
+        if *interaction == Interaction::Pressed {
+            // Check if this button contains the music toggle text
+            if let Some(child) = children.first().copied()
+                && text_color_query.get(child).is_ok()
+            {
+                // Toggle music
+                use bevy_kira_audio::AudioTween;
+                if audio_state.is_playing {
+                    // Pause the music
+                    if let Some(instance_handle) = &audio_state.instance
+                        && let Some(instance) = audio_instances.get_mut(instance_handle)
+                    {
+                        instance.pause(AudioTween::default());
+                        audio_state.is_playing = false;
+                        bevy::log::info!("Music paused");
+                    }
+                } else {
+                    // Resume or restart the music
+                    if let Some(instance_handle) = &audio_state.instance {
+                        if let Some(instance) = audio_instances.get_mut(instance_handle) {
+                            instance.resume(AudioTween::default());
+                            audio_state.is_playing = true;
+                            bevy::log::info!("Music resumed");
+                        } else {
+                            // Instance was removed, restart the audio
+                            let instance = audio.play(audio_state.loop_handle.clone()).looped().handle();
+                            audio_state.instance = Some(instance);
+                            audio_state.is_playing = true;
+                            bevy::log::info!("Music restarted");
+                        }
+                    } else {
+                        // No instance, start the audio
+                        let instance = audio.play(audio_state.loop_handle.clone()).looped().handle();
+                        audio_state.instance = Some(instance);
+                        audio_state.is_playing = true;
+                        bevy::log::info!("Music started");
+                    }
+                }
+                
+                // Update button text color to indicate state
+                if let Ok(mut text_color) = text_color_query.get_mut(child) {
+                    if audio_state.is_playing {
+                        *text_color = TextColor(Color::srgb(0.9, 0.9, 0.9)); // Bright when on
+                    } else {
+                        *text_color = TextColor(Color::srgb(0.4, 0.4, 0.4)); // Dim when off
+                    }
+                }
+            }
+        }
+    }
 }

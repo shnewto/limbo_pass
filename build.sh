@@ -34,13 +34,13 @@ if ! command -v wasm-opt &> /dev/null; then
     cargo install wasm-opt
 fi
 
-# Build the WASM binary with aggressive size optimizations
+# Build the WASM binary with size optimizations
 echo "Building WASM binary with size optimizations..."
 # Use release for production, but can use debug for faster iteration
 if [ "${BUILD_MODE:-release}" = "debug" ]; then
     cargo build --target wasm32-unknown-unknown
 else
-    RUSTFLAGS="-C opt-level=z -C link-arg=-zstack-size=8388608" \
+    RUSTFLAGS="-C link-arg=-zstack-size=8388608" \
     cargo build --target wasm32-unknown-unknown --release
 fi
 
@@ -75,9 +75,9 @@ wasm-bindgen \
 echo "Optimizing WASM file..."
 ORIGINAL_SIZE=$(du -h "$OUTPUT_DIR/limbo_pass_bg.wasm" | cut -f1)
 if command -v wasm-opt &> /dev/null; then
-    # Use aggressive optimization: -Oz (optimize for size) with additional flags
+    # Use size optimization: -Os (balance between size and speed) with additional flags
     # Enable required WASM features for validation
-    wasm-opt -Oz --strip-debug --strip-producers --enable-bulk-memory --enable-nontrapping-float-to-int -o "$OUTPUT_DIR/limbo_pass_bg.wasm.opt" "$OUTPUT_DIR/limbo_pass_bg.wasm"
+    wasm-opt -Os --strip-debug --strip-producers --enable-bulk-memory --enable-nontrapping-float-to-int -o "$OUTPUT_DIR/limbo_pass_bg.wasm.opt" "$OUTPUT_DIR/limbo_pass_bg.wasm"
     mv "$OUTPUT_DIR/limbo_pass_bg.wasm.opt" "$OUTPUT_DIR/limbo_pass_bg.wasm"
     OPTIMIZED_SIZE=$(du -h "$OUTPUT_DIR/limbo_pass_bg.wasm" | cut -f1)
     echo "WASM optimized: $ORIGINAL_SIZE -> $OPTIMIZED_SIZE"
@@ -94,8 +94,9 @@ else
     echo "WASM file size: $ORIGINAL_SIZE"
 fi
 
-# Copy and update index.html
-echo "Copying index.html..."
+# Copy sound.js and index.html
+echo "Copying sound.js and index.html..."
+cp sound.js "$OUTPUT_DIR/" 2>/dev/null || true
 cp index.html "$OUTPUT_DIR/"
 # Update the import path in index.html to match the generated file
 if [[ "$OSTYPE" == "darwin"* ]]; then

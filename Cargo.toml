@@ -55,7 +55,7 @@ features = [
 ]
 
 [profile.release]
-opt-level = "z"     # Optimize for size
+opt-level = "s"     # Optimize for size (less aggressive than "z")
 lto = "fat"         # Link-time optimization
 codegen-units = 1   # Better optimization, slower compile
 strip = "symbols"   # Strip symbols

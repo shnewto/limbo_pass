@@ -64,6 +64,7 @@ fn main() {
             setup::spawn_controls_text,
         ))
         .add_systems(Update, (
+            setup::handle_music_toggle.run_if(in_state(AppState::Running)),
             form::get_movement.run_if(in_state(AppState::Running)),
             form::apply_movement.after(form::get_movement).run_if(in_state(AppState::Running)),
             form::wrap_movement.after(form::apply_movement).run_if(in_state(AppState::Running)),
