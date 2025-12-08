@@ -1,5 +1,5 @@
 name = "limbopass"
-compatibility_date = "2025-12-07"
+compatibility_date = "2025-11-25"
 
 pages_build_output_dir = "./dist"
 

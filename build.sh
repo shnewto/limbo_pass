@@ -48,7 +48,7 @@ fi
 OUTPUT_DIR="dist"
 mkdir -p "$OUTPUT_DIR"
 
-# Copy assets
+# Copy assets (including .meta files)
 echo "Copying assets..."
 cp -r assets "$OUTPUT_DIR/"
 
